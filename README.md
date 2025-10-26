@@ -1,155 +1,116 @@
-# CareScan Web
+# CareScan - AI-Powered Health Prediction Platform
 
-CareScan Web is a lightweight React (Vite) implementation of the CareScan app for the browser. It mirrors the main app’s screens and uses the same assets and API endpoints for predictions and risk assessments.
+CareScan is a comprehensive web application that helps users monitor and predict various health conditions using artificial intelligence.
 
-- Tech stack: React 19 + Vite 5
-- Assets: copied to `public/assets`
-- Routing: client-side via React Router
-- Build: static site (can be hosted on any static host)
+## Features
 
-## Prerequisites
+### 🔬 AI Disease Prediction
 
-- Node.js 18+ (recommended LTS)
-- npm (bundled with Node.js) or Yarn
+**Diabetes Risk Assessment**
+- Analyzes 8 key health parameters including glucose levels, BMI, blood pressure, and age
+- Provides instant risk assessment with detailed predictions
+- Tracks parameters: Pregnancies, Glucose, Blood Pressure, Skin Thickness, Insulin, BMI, Diabetes Pedigree Function, Age
 
-Check versions:
-~~~
-node -v
-npm -v
-~~~
+**Hypertension Screening**
+- Evaluates cardiovascular health risk factors
+- Considers gender, age, diabetes status, heart disease history, and smoking habits
+- Analyzes BMI, HbA1c levels, and blood glucose
 
-## Getting started
+**Chronic Kidney Disease (CKD) Detection**
+- Comprehensive kidney function analysis
+- Tracks 24 clinical parameters including blood tests and urine analysis
+- Monitors blood pressure, albumin, sugar, and blood cell counts
 
-1) Navigate to the web folder:
-~~~
-cd CareScan/web
-~~~
+**Lung Cancer Analysis**
+- AI-powered CT scan image analysis
+- Detects Normal, Benign, or Malignant conditions
+- Provides confidence scores for predictions
 
-2) Install dependencies:
-- With npm:
-~~~
-npm install
-~~~
-- Or with Yarn:
-~~~
-yarn
-~~~
+**Pneumonia Detection**
+- Chest X-ray analysis for pneumonia signs
+- Binary classification with confidence percentage
+- Fast and accurate screening tool
 
-3) Start the development server:
-- With npm:
-~~~
-npm run dev
-~~~
-- Or with Yarn:
-~~~
-yarn dev
-~~~
+**Skin Disease Identification**
+- Image-based skin condition analysis
+- Identifies multiple skin diseases with confidence scores
+- Visual pattern recognition for early detection
 
-This launches Vite on http://localhost:5173 (it may open automatically).
+### 📊 Health Management
 
-## Build for production
+**Health Trends & Analytics**
+- Track health metrics over time
+- View glucose and BMI trends for diabetes predictions
+- Monitor blood glucose levels for hypertension
+- Prediction summary dashboard showing total tests by category
+- Recent activity timeline
 
-- Create an optimized build:
-~~~
-npm run build
-~~~
+**Health Reports**
+- Complete prediction history storage
+- Detailed parameter tracking for all assessments
+- Export reports as PDF for doctor consultations
+- Color-coded results for easy interpretation
+- Timestamps for all predictions
 
-- Preview the production build locally (useful to verify before deploying):
-~~~
-npm run preview
-~~~
+### 💊 Medication Management
 
-The build output is generated in `web/dist`.
+**Medication Tracker**
+- Add and manage multiple medications
+- Track dosage, frequency, and timing
+- Set medication reminders
+- Add custom notes (e.g., "Take with food")
+- Quick access to all active medications
 
-## Project structure (web)
+### 🚨 Emergency Features
 
-- `web/`
-  - `index.html` — HTML entry point
-  - `vite.config.js` — Vite configuration
-  - `package.json` — scripts and dependencies
-  - `public/`
-    - `assets/` — images (copied from the app’s assets)
-  - `src/`
-    - `main.jsx` — App entry, routes, and page implementations
+**Emergency Contact Management**
+- Store personal emergency contacts
+- Quick access to contact phone numbers and email
+- Pre-loaded Indian emergency numbers (108, 100, 101)
+- One-tap calling functionality
+- Relationship tagging for contacts
 
-## Routes and features
+**Doctor Directory**
+- 10+ verified medical specialists
+- Multiple specialties: Cardiology, Dermatology, General Medicine, Pulmonology, Endocrinology, Nephrology, Oncology, Neurology, Rheumatology, Gastroenterology
+- Direct contact information with phone numbers
+- Experience details for each doctor
+- One-click call functionality
 
-The web app provides the same top-level screens as the app:
+### 📖 Health Education
 
-- `/` — Home
-- `/scanner` — Condition list
-  - `/scanner/skin` — Skin disease image upload and predict
-  - `/scanner/pneumonia` — Pneumonia X-ray upload and predict
-  - `/scanner/lung-cancer` — Lung cancer image upload and predict
-  - `/scanner/diabetes` — Diabetes risk form
-  - `/scanner/hypertension` — Hypertension risk form
-  - `/scanner/ckd` — CKD risk form
-- `/health` — Health overview (static mock)
-- `/profile` — Profile (static mock)
+**Learn About Conditions**
+- Comprehensive information on 6 major health conditions
+- Common symptoms for each condition
+- Prevention tips and guidelines
+- Easy-to-understand medical information
+- No technical jargon
 
-## APIs used
+### 🔐 User Authentication
 
-The web version calls the same public endpoints as the app:
+**Secure Sign In/Sign Up**
+- Email and password authentication via Supabase
+- User profile with name and surname
+- Personalized welcome messages
+- Session persistence
+- Secure data handling
 
-- Skin disease (image):
-  - `https://walgar-skin-2.hf.space/predict`
-- Pneumonia (image):
-  - `https://walgar-pneumonia.hf.space/predict`
-- Lung cancer (image):
-  - `https://walgar-lung.hf.space/predict`
-- Diabetes (form-data):
-  - `https://walgar-diabetes.hf.space/predict`
-- Hypertension (JSON body):
-  - `https://walgar-hyper.hf.space/predict`
-- CKD (JSON body):
-  - `https://walgar-ckd.hf.space/predict`
+### 📱 User Experience
 
-Notes:
-- No API keys are required.
-- If an endpoint is down or responds with unexpected data, you’ll see an error on the page.
-- Responses are normalized for display, but exact shapes may vary between services.
+**Responsive Design**
+- Works seamlessly on desktop, tablet, and mobile
+- Modern, clean interface with Inter font
+- Smooth animations and transitions
+- Intuitive navigation
+- Accessible design principles
 
-## Common issues and troubleshooting
+**Privacy-Focused**
+- Medical images are not stored
+- Only prediction results and parameters are saved
+- Local storage for offline access
+- No data sharing with third parties
+- HIPAA-conscious architecture
 
-- Port already in use (5173):
-  - Stop the process using the port or run with a different port:
-    ~~~
-    npm run dev -- --port=5174
-    ~~~
-- CORS errors:
-  - The target API must allow browser requests. If CORS is blocked by the remote server, you will see errors in the browser console. Try again later or through a proxy if needed.
-- Mixed content / HTTPS:
-  - When hosting over HTTPS, ensure all APIs are also HTTPS (these endpoints already are).
-- Image upload fails:
-  - Make sure you select an image file (JPG/PNG). Very large images may take longer to upload.
-- Build not routing correctly on your host:
-  - Configure your host for SPA fallback so all routes serve `index.html` (e.g., Netlify `_redirects`, Vercel rewrites).
+## Technology
 
-## Customization
-
-- App title:
-  - Update the document title in `src/main.jsx` (`document.title = "CareScan Web"`).
-- Assets:
-  - Replace or add images in `public/assets`. Update references in `src/main.jsx`.
-- Colors and styles:
-  - The UI is inline-styled for simplicity. Adjust styles directly in components in `src/main.jsx`.
-
-## Deployment
-
-Since this is a static build, you can deploy `web/dist` to:
-- Netlify
-- Vercel
-- GitHub Pages
-- Any static server (Nginx, Apache, S3 + CloudFront, etc.)
-
-Ensure SPA routing fallback to `index.html` is configured on your platform.
-
-## Scripts reference
-
-- `npm run dev` — start Vite dev server
-- `npm run build` — build for production (output to `dist`)
-- `npm run preview` — preview production build locally
-
-## License and usage
-
-This web UI is intended as a companion front-end for demo and educational purposes. The predictions are not medical advice. Always consult a qualified healthcare professional for diagnosis or treatment.
+Built with React 19, Vite, Supabase, and integrated machine learning models for fast, secure, and accurate health predictions.
