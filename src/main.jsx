@@ -12,7 +12,7 @@ import {
 } from "react-router-dom";
 
 import { Scan, Stethoscope, FileText, BookOpen } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
+
 
 // ---------- Prediction History Storage ----------
 
@@ -498,301 +498,12 @@ function TopNav() {
   );
 }
 
-// ---------- Auth Gate ----------
-function AuthGate({ children }) {
-  const [supabase] = useState(() =>
-    createClient(
-      "https://kgnkzozimkhiumedbfqb.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtnbmt6b3ppbWtoaXVtZWRiZnFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0ODE3NTMsImV4cCI6MjA3NzA1Nzc1M30.-CW3cPZ5BI_7-55Rsy6K9BL4dIfPzHorfYztkhENtWw",
-    ),
-  );
-  const [user, setUser] = useState(undefined); // undefined => loading
-  const [mode, setMode] = useState("signin"); // 'signin' | 'signup'
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const { data } = await supabase.auth.getUser();
-        if (active) setUser(data?.user ?? null);
-      } catch (_e) {
-        if (active) setUser(null);
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [supabase]);
-
-  useEffect(() => {
-    if (!supabase) return;
-    const { data: { subscription } = { subscription: null } } =
-      supabase.auth.onAuthStateChange((_event, session) => {
-        setUser(session?.user ?? null);
-      });
-    return () => {
-      if (subscription) subscription.unsubscribe();
-    };
-  }, [supabase]);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    console.log("Form submitted", { mode, email, hasSupabase: !!supabase });
-
-    if (!supabase) {
-      setError("Supabase client not initialized");
-      console.error("No supabase client");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      if (mode === "signin") {
-        console.log("Attempting sign in...");
-        const { data, error: err } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        console.log("Sign in response:", { data, error: err });
-        if (err) throw err;
-      } else {
-        console.log("Attempting sign up...");
-        const { data, error: err } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              name: name,
-              surname: surname,
-              full_name: `${name} ${surname}`,
-            },
-          },
-        });
-        console.log("Sign up response:", { data, error: err });
-        if (err) throw err;
-        if (data?.user && !data?.session) {
-          setError("Check your email to verify your account");
-        }
-      }
-    } catch (e) {
-      console.error("Auth error:", e);
-      setError(e.message || "Authentication failed");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "16px",
-          boxSizing: "border-box",
-        }}
-      >
-        <Container style={{ maxWidth: 480 }}>
-          <Section title="Loading">
-            <div>Preparing your experience...</div>
-          </Section>
-        </Container>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "linear-gradient(180deg, #f7faff, #ffffff)",
-          padding: "16px",
-          boxSizing: "border-box",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: "420px",
-            margin: "0 auto",
-          }}
-        >
-          <Section style={{ padding: "24px 20px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <img
-                  src="/assets/carescan_logo.jpg"
-                  alt="CareScan"
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 8,
-                    objectFit: "cover",
-                    flexShrink: 0,
-                  }}
-                />
-                <div
-                  style={{
-                    fontWeight: 800,
-                    fontSize: "clamp(18px, 5vw, 20px)",
-                    color: "#222",
-                  }}
-                >
-                  CareScan
-                </div>
-              </div>
-
-              <div
-                style={{
-                  fontSize: "clamp(16px, 4.5vw, 18px)",
-                  fontWeight: 800,
-                  color: "#333",
-                }}
-              >
-                {mode === "signin" ? "Welcome back" : "Create your account"}
-              </div>
-              <div style={{ color: "#666", fontSize: "14px" }}>
-                {mode === "signin"
-                  ? "Sign in to continue"
-                  : "Sign up to get started"}
-              </div>
-
-              <form
-                onSubmit={handleSubmit}
-                style={{ display: "grid", gap: 12 }}
-              >
-                {mode === "signup" && (
-                  <>
-                    <Input
-                      label="Name"
-                      value={name}
-                      onChange={setName}
-                      type="text"
-                      placeholder="John"
-                      required
-                    />
-                    <Input
-                      label="Surname"
-                      value={surname}
-                      onChange={setSurname}
-                      type="text"
-                      placeholder="Doe"
-                      required
-                    />
-                  </>
-                )}
-                <Input
-                  label="Email"
-                  value={email}
-                  onChange={setEmail}
-                  type="email"
-                  placeholder="you@example.com"
-                  required
-                />
-                <Input
-                  label="Password"
-                  value={password}
-                  onChange={setPassword}
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
-
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <Button
-                    type="button"
-                    variant={mode === "signin" ? "purple" : "gray"}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setMode("signin");
-                    }}
-                    style={{ flex: "1 1 auto", minWidth: "100px" }}
-                  >
-                    Sign In
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={mode === "signup" ? "purple" : "gray"}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setMode("signup");
-                    }}
-                    style={{ flex: "1 1 auto", minWidth: "100px" }}
-                  >
-                    Sign Up
-                  </Button>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={loading || !supabase}
-                  style={{ width: "100%" }}
-                  onClick={(e) => {
-                    console.log("Submit button clicked");
-                  }}
-                >
-                  {loading
-                    ? mode === "signin"
-                      ? "Signing in..."
-                      : "Signing up..."
-                    : mode === "signin"
-                      ? "Continue"
-                      : "Create Account"}
-                </Button>
-                {!supabase && (
-                  <div style={{ color: "#FF6B6B", fontSize: 12 }}>
-                    Initializing authentication...
-                  </div>
-                )}
-                <ErrorBox>{error}</ErrorBox>
-              </form>
-            </div>
-          </Section>
-        </div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-}
 
 // ---------- Pages ----------
 
 function Home() {
   const navigate = useNavigate();
-  const [supabase] = useState(() =>
-    createClient(
-      "https://kgnkzozimkhiumedbfqb.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtnbmt6b3ppbWtoaXVtZWRiZnFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0ODE3NTMsImV4cCI6MjA3NzA1Nzc1M30.-CW3cPZ5BI_7-55Rsy6K9BL4dIfPzHorfYztkhENtWw",
-    ),
-  );
-  const [userName, setUserName] = useState("User");
-
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data?.user?.user_metadata?.name) {
-        setUserName(data.user.user_metadata.name);
-      }
-    })();
-  }, [supabase]);
 
   const cards = [
     {
@@ -848,9 +559,9 @@ function Home() {
             color: "#666",
           }}
         >
-          <span>Welcome back,</span>
+          <span>Welcome to</span>
 
-          <strong style={{ color: "#333" }}>{userName}</strong>
+          <strong style={{ color: "#333" }}>CareScan</strong>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 16 }}>
@@ -1152,91 +863,36 @@ function Health() {
 }
 
 function Profile() {
-  const [supabase] = useState(() =>
-    createClient(
-      "https://kgnkzozimkhiumedbfqb.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtnbmt6b3ppbWtoaXVtZWRiZnFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0ODE3NTMsImV4cCI6MjA3NzA1Nzc1M30.-CW3cPZ5BI_7-55Rsy6K9BL4dIfPzHorfYztkhENtWw",
-    ),
-  );
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data } = await supabase.auth.getUser();
-      if (active) setUser(data?.user ?? null);
-    })();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (active) setUser(session?.user ?? null);
-    });
-
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
-
-  async function handleSignOut() {
-    if (!supabase) return;
-    setLoading(true);
-    setError("");
-    try {
-      await supabase.auth.signOut();
-    } catch (e) {
-      setError(e.message || "Sign out failed");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <Container>
       <Section>
-        {user ? (
-          <div style={{ display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 30,
-                  background: "linear-gradient(135deg, #0092FF, #8E24AA)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  fontSize: 24,
-                  fontWeight: 800,
-                }}
-              >
-                {user.user_metadata?.name?.charAt(0)?.toUpperCase() ||
-                  user.email.charAt(0).toUpperCase()}
-              </div>
-
-              <div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: "#333" }}>
-                  {user.user_metadata?.full_name || user.email}
-                </div>
-                <div style={{ fontSize: 14, color: "#666" }}>{user.email}</div>
-              </div>
+        <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: 30,
+                background: "linear-gradient(135deg, #0092FF, #8E24AA)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: 24,
+                fontWeight: 800,
+              }}
+            >
+              U
             </div>
 
-            <Button variant="danger" onClick={handleSignOut} disabled={loading}>
-              {loading ? "Signing out..." : "Sign Out"}
-            </Button>
-
-            {error && <ErrorBox>{error}</ErrorBox>}
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#333" }}>
+                CareScan User
+              </div>
+              <div style={{ fontSize: 14, color: "#666" }}>Local profile</div>
+            </div>
           </div>
-        ) : (
-          <div style={{ textAlign: "center", color: "#666" }}>
-            Please sign in from the login page
-          </div>
-        )}
+        </div>
       </Section>
     </Container>
   );
@@ -3772,7 +3428,7 @@ function App() {
   }, []);
 
   return (
-    <AuthGate>
+    <>
       <div>
         <TopNav />
         <Routes>
@@ -3824,7 +3480,7 @@ function App() {
           </Container>
         </footer>
       </div>
-    </AuthGate>
+    </>
   );
 }
 

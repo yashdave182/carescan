@@ -10,7 +10,6 @@
     "preview": "vite preview --port 5173"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
     "axios": "^1.10.0",
     "jspdf": "^3.0.3",
     "lucide-react": "^0.441.0",
